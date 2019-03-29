@@ -1,0 +1,19 @@
+{
+  "name": "opaque-client",
+  "version": "0.0.1",
+  "author": "Peter Squicciarini <stripedpajamas273@gmail.com",
+  "maintainers": [
+    "Peter Squicciarini <stripedpajamas273@gmail.com>"
+  ],
+  "description": "OPAQUE protocol implementation (client)",
+  "scripts": {
+    "lint": "standard --fix",
+    "test": "npm run lint"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  },
+  "dependencies": {
+    "tweetnacl": "^1.0.1"
+  }
+}
