@@ -15,8 +15,8 @@ implementations:
 - [@frekui/opaque (Go)](https://github.com/frekui/opaque)
 
 some sequence diagrams (very possibly inaccurate):
-- [registration](https://github.com/stripedpajamas/opaque/blob/master/example/Registration.svg)
-- [login](https://github.com/stripedpajamas/opaque/blob/master/example/Login.svg)
+- [registration](https://github.com/stripedpajamas/opaque-js/blob/master/example/Registration.svg)
+- [login](https://github.com/stripedpajamas/opaque-js/blob/master/example/Login.svg)
 
 ## License
 MIT
