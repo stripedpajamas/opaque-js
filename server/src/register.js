@@ -10,3 +10,16 @@
  * 7. Receive user parameters from client
  * 8. Save user parameters to storage, keyed by username
  */
+
+ class Server {
+  constructor (config = {}) {
+    this.config = Object.assign({}, {
+      // default config options go here
+    }, config)
+  }
+  handler (input) {
+
+  }
+ }
+
+ module.exports = Server
