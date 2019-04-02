@@ -1,10 +1,9 @@
-const { EventEmitter } = require('events')
-const { generateOPRFKey } = require('./oprf')
+const oprf = require('./oprf')
 
 /**
  * Server-side registration flow
  *
- * 1. Receive username from client
+ * 1. Receive ID from client
  * 2. Generate keypair if no keypair exists globally
  * 3. Persist keypair for future registrations/authentications
  * 4. Generate random per-user OPRF key
@@ -14,21 +13,34 @@ const { generateOPRFKey } = require('./oprf')
  * 8. Save user parameters to storage, keyed by username
  */
 
-class RegistrationServer extends EventEmitter {
+class RegistrationServer {
   constructor (config = {}) {
-    super()
     this.config = Object.assign({}, {
       // default config options go here
     }, config)
   }
-  init () {
-    // if doing per-session keypairs
-    // generate keypairs and emit keypair save event
-    // generate and save per-user OPRF key kU
-    this.OPRFKey = generateOPRFKey()
-  }
-  register () {
+  start ({ username, challenge }) {
+    const { publicKey, secretKey } = oprf.keypair()
+    const response = oprf.response({ secretKey, challenge })
 
+    // these will be persisted at the end of the flow
+    this.username = username
+    this.publicKey = publicKey
+    this.secretKey = secretKey
+
+    return { publicKey, response }
+  }
+  register ({ envelope, publicKey }) {
+    // user provides envelope and their public key
+    // we persist a user record { env, pubU, kU, vU }
+    // where kU, vU are secretKey, publicKey from OPRF
+    return {
+      username: this.username,
+      envelope,
+      userPublicKey: publicKey,
+      oprfPublicKey: this.publicKey,
+      oprfSecretKey: this.secretKey
+    }
   }
 }
 

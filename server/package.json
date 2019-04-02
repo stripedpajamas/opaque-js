@@ -10,6 +10,9 @@
     "lint": "standard --fix",
     "test": "npm run lint && ava"
   },
+  "ava": {
+    "verbose": true
+  },
   "devDependencies": {
     "ava": "^1.4.1",
     "standard": "^12.0.1"

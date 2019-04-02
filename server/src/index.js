@@ -1,14 +1,12 @@
-const { EventEmitter } = require('events')
 const sodium = require('sodium-native')
-const { EVENTS } = require('./constants')
+const RegistrationServer = require('./register')
 
 /**
  * Server class for registration and authentication
  */
 
-class Server extends EventEmitter {
+class Server {
   constructor (config = {}) {
-    super()
     this.config = Object.assign({}, {
       pk: null,
       sk: null,
@@ -17,7 +15,8 @@ class Server extends EventEmitter {
 
     this.log = this.config.log
 
-    this.init()
+    // keep track of registrations because it's a multi-step flow
+    this.registrations = new Map()
   }
   init () {
     const {
@@ -28,14 +27,36 @@ class Server extends EventEmitter {
     if (!pk || !sk || pk.length !== pkLength || sk.length !== skLength) {
       this.log('Missing or invalid keypair, generating fresh')
       const newPk = Buffer.alloc(pkLength)
-      const newSk = Buffer.alloc(skLength)
+      const newSk = sodium.sodium_malloc(skLength)
       sodium.crypto_kx_keypair(newPk, newSk)
       this.config.pk = newPk
       this.config.sk = newSk
 
       // allow consumer to persist keypair
-      this.emit(EVENTS.KEYPAIR_GENERATED, { pk: newPk, sk: newSk })
+      return { pk: newPk, sk: newSk }
     }
+  }
+  /**
+   * Register a new user
+   * @param {object} userParams
+   * Step 1 requires username and challenge
+   * Step 2 requires envelope and publicKey
+   */
+  register ({ config = {}, username, challenge, envelope, publicKey }) {
+    if (!this.registrations.has(username)) {
+      // first step of registration flow
+      const registration = new RegistrationServer(Object.assign({}, this.config, config))
+      this.registrations.set(username, registration)
+      const response = registration.start({ username, challenge })
+      return response
+    }
+    // second step of registration flow
+    const registration = this.registrations.get(username)
+    const userData = registration.register({ envelope, publicKey })
+
+    // cleanup registrations map
+    this.registrations.delete(username)
+    return userData
   }
 }
 
