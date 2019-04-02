@@ -8,9 +8,10 @@
   "description": "OPAQUE protocol implementation (server)",
   "scripts": {
     "lint": "standard --fix",
-    "test": "npm run lint"
+    "test": "npm run lint && ava"
   },
   "devDependencies": {
+    "ava": "^1.4.1",
     "standard": "^12.0.1"
   },
   "dependencies": {
