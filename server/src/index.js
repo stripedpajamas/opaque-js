@@ -1,5 +1,6 @@
 const sodium = require('sodium-native')
 const RegistrationServer = require('./register')
+const AuthenticationServer = require('./authenticate')
 
 /**
  * Server class for registration and authentication
@@ -15,8 +16,9 @@ class Server {
 
     this.log = this.config.log
 
-    // keep track of registrations because it's a multi-step flow
+    // keep track of regs/auths because it's a multi-step flow
     this.registrations = new Map()
+    this.authentications = new Map()
   }
   init () {
     const {
@@ -57,6 +59,23 @@ class Server {
     // cleanup registrations map
     this.registrations.delete(username)
     return userData
+  }
+  authenticate ({ config = {}, userData, challenge, proof }) {
+    const { username } = userData
+    if (!this.authentications.has(username)) {
+      // first step of authentication flow
+      const authentication = new AuthenticationServer(Object.assign({}, this.config, config))
+      this.authentications.set(username, authentication)
+      const response = authentication.start({ userData, challenge })
+      return response
+    }
+    // second step of authentication flow
+    const authentication = this.authentications.get(username)
+    const verified = authentication.verify({ proof })
+
+    // cleanup authentications map
+    this.authentications.delete(username)
+    return verified
   }
 }
 
