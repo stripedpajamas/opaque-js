@@ -40,7 +40,7 @@ class Server {
    * Register a new user
    * @param {object} userParams
    * Step 1 requires username and challenge
-   * Step 2 requires envelope and publicKey
+   * Step 2 requires username, envelope and publicKey
    */
   register ({ config = {}, username, challenge, envelope, publicKey }) {
     if (!this.registrations.has(username)) {

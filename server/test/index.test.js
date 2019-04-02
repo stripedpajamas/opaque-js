@@ -24,4 +24,15 @@ test('registration flow', (t) => {
   t.is(server.registrations.size, 1)
   t.is(publicKey.length, sodium.crypto_core_ed25519_BYTES)
   t.is(response.length, sodium.crypto_core_ed25519_BYTES)
+
+  const envelope = {}
+  const userPublicKey = Buffer.alloc(0)
+  const userData = server.register({ username, envelope, publicKey: userPublicKey })
+
+  t.is(server.registrations.size, 0)
+  t.is(userData.userPublicKey, userPublicKey)
+  t.is(userData.envelope, envelope)
+  t.is(userData.username, username)
+  t.is(userData.oprfPublicKey.length, sodium.crypto_core_ed25519_BYTES)
+  t.is(userData.oprfSecretKey.length, sodium.crypto_core_ed25519_SCALARBYTES)
 })
