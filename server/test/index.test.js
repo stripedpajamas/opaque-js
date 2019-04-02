@@ -73,5 +73,5 @@ test('authentication flow', (t) => {
 
   const authenticated = server.authenticate({ userData, proof })
   t.truthy(authenticated)
-  t.is()
+  t.is(server.authentications.size, 0)
 })
