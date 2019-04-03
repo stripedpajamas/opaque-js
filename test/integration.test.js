@@ -17,15 +17,19 @@ test('full flow', (t) => {
   // userData is to be persisted on the server
   // the user is now considered registered
 
-  // confirming that the userData packet has everything it's supposed to
-  const expectedFields = [
-    'username',
-    'envelope',
-    'userPublicKey',
-    'oprfPublicKey',
-    'oprfSecretKey'
-  ]
-  for (let field of expectedFields) {
-    t.not(typeof userData[field], 'undefined')
-  }
+  // client wants to authenticate
+  clientMessage1 = client.authenticate({ username, password })
+  // server looks up username in DB to find userData
+  // and then continues
+  serverMessage1 = server.authenticate({
+    userData,
+    ...clientMessage1
+  })
+  clientMessage2 = client.authenticate(serverMessage1)
+  const authenticated = server.authenticate({
+    userData,
+    ...clientMessage2
+  })
+
+  t.is(authenticated, true) // 🎉🎉🎉
 })

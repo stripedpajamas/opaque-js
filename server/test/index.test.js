@@ -16,10 +16,10 @@ test('registration flow', (t) => {
   const challenge = Buffer.alloc(sodium.crypto_scalarmult_ed25519_BYTES)
   sodium.randombytes_buf(secret)
   sodium.crypto_core_ed25519_from_uniform(challenge, secret)
-  const { oprfPublicKey, publicKey, response } = server.register({ username, challenge })
+  const { oprfPublicKey, serverPublicKey, response } = server.register({ username, challenge })
 
   t.is(server.registrations.size, 1)
-  t.is(publicKey.length, sodium.crypto_kx_PUBLICKEYBYTES)
+  t.is(serverPublicKey.length, sodium.crypto_kx_PUBLICKEYBYTES)
   t.is(oprfPublicKey.length, sodium.crypto_core_ed25519_BYTES)
   t.is(response.length, sodium.crypto_core_ed25519_BYTES)
 
@@ -55,20 +55,18 @@ test('authentication flow', (t) => {
   const {
     envelope: retrievedEnvelope,
     oprfPublicKey,
-    kxPublicKey,
     response
   } = server.authenticate({ userData, challenge })
 
   t.is(server.authentications.size, 1)
   t.is(retrievedEnvelope, envelope)
   t.is(oprfPublicKey.length, sodium.crypto_core_ed25519_BYTES)
-  t.is(kxPublicKey.length, sodium.crypto_kx_PUBLICKEYBYTES)
   t.is(response.length, sodium.crypto_core_ed25519_BYTES)
 
   // client does some stuff with the envelope to retrieve their private key
   // and can then perform a key exchange
   const userSession = Buffer.alloc(sodium.crypto_kx_SESSIONKEYBYTES)
-  sodium.crypto_kx_client_session_keys(userSession, null, userPk, userSk, kxPublicKey)
+  sodium.crypto_kx_client_session_keys(userSession, null, userPk, userSk, server.config.pk)
 
   const authenticated = server.authenticate({ userData, userSession })
   t.truthy(authenticated)

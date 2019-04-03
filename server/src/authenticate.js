@@ -25,7 +25,7 @@ class AuthenticationServer {
     const { envelope, userPublicKey, oprfPublicKey, oprfSecretKey } = userData
     const response = oprf.response({ secretKey: oprfSecretKey, challenge })
     this.userPublicKey = userPublicKey
-    return { envelope, oprfPublicKey, kxPublicKey: this.config.pk, response }
+    return { envelope, oprfPublicKey, response }
   }
   authenticate ({ userSession }) {
     if (!this.userPublicKey) return false

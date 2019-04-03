@@ -25,7 +25,11 @@ class RegistrationServer {
     this.oprfPublicKey = publicKey
     this.oprfSecretKey = secretKey
 
-    return { publicKey: this.config.pk, oprfPublicKey: this.oprfPublicKey, response }
+    return {
+      serverPublicKey: this.config.pk,
+      oprfPublicKey: this.oprfPublicKey,
+      response
+    }
   }
   register ({ envelope, publicKey }) {
     // user provides envelope and their public key

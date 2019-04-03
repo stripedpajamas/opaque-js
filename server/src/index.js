@@ -63,8 +63,10 @@ class Server {
     return userData
   }
   /**
-   * Authenticate an already registeredd user
+   * Authenticate an already registered user
    * @param {object} params
+   * Step 1 requires userData, challenge
+   * Step 2 requires userData, userSession
    */
   authenticate ({ config = {}, userData, challenge, userSession }) {
     const { username } = userData
