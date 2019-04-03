@@ -24,7 +24,7 @@ class RegistrationClient {
     this.pk = pk
     this.sk = sk
 
-    // but buffered password on class
+    // put buffered password on class
     this.password = Buffer.from(password)
 
     // begin OPRF flow

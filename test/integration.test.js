@@ -16,6 +16,8 @@ test('full flow', (t) => {
 
   // userData is to be persisted on the server
   // the user is now considered registered
+
+  // confirming that the userData packet has everything it's supposed to
   const expectedFields = [
     'username',
     'envelope',

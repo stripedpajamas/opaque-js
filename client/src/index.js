@@ -1,8 +1,10 @@
 const RegistrationClient = require('./register')
+const AuthenticationClient = require('./authenticate')
 
 class Client {
   constructor () {
     this.registration = null
+    this.authentication = null
   }
   /**
    * Register a user with the server
@@ -22,6 +24,25 @@ class Client {
     })
     this.registration = null
     return result
+  }
+  /**
+   * Authenticate with the server
+   * @param {object} params
+   * Step 1 requires username, password
+   * Step 2 requires envelope, oprfPublicKey, response
+   */
+  authenticate ({ username, password, envelope, oprfPublicKey, response }) {
+    if (!this.authentication) {
+      this.authentication = new AuthenticationClient()
+      return this.authentication.start({ username, password })
+    }
+    const { userSession } = this.authentication.authenticate({
+      envelope,
+      oprfPublicKey,
+      response
+    })
+    this.authentication = null
+    return { userSession }
   }
 }
 
