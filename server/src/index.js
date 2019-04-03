@@ -62,6 +62,10 @@ class Server {
     this.registrations.delete(username)
     return userData
   }
+  /**
+   * Authenticate an already registeredd user
+   * @param {object} params
+   */
   authenticate ({ config = {}, userData, challenge, userSession }) {
     const { username } = userData
     if (!this.authentications.has(username)) {

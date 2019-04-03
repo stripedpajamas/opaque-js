@@ -1,3 +1,3 @@
-/**
- * Tests for client-side authentication flow
- */
+const test = require('ava')
+
+test('nothing', t => t.pass())

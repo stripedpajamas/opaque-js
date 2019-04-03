@@ -1,3 +1,3 @@
-/**
- * Tests for client-side registration logic
- */
+const test = require('ava')
+
+test('nothing', t => t.pass())

@@ -35,7 +35,7 @@ class RegistrationClient {
     // challenge can now be consumed be the server
     return { username, challenge }
   }
-  register ({ response, oprfPublicKey, publicKey }) {
+  register ({ response, oprfPublicKey, serverPublicKey }) {
     // server sent back response to challenge and OPRF public key
     // complete the OPRF flow
     const rwd = oprf.output({
@@ -51,7 +51,7 @@ class RegistrationClient {
     const message = Buffer.from(JSON.stringify({
       userPublicKey: this.pk,
       userSecretKey: this.sk,
-      serverPublicKey: publicKey
+      serverPublicKey
     }))
     const ciphertext = Buffer.alloc(message.length + sodium.crypto_secretbox_MACBYTES)
 
