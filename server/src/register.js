@@ -22,10 +22,10 @@ class RegistrationServer {
 
     // these will be persisted at the end of the flow
     this.username = username
-    this.publicKey = publicKey
-    this.secretKey = secretKey
+    this.oprfPublicKey = publicKey
+    this.oprfSecretKey = secretKey
 
-    return { publicKey, response }
+    return { publicKey: this.config.pk, oprfPublicKey: this.oprfPublicKey, response }
   }
   register ({ envelope, publicKey }) {
     // user provides envelope and their public key
@@ -35,8 +35,8 @@ class RegistrationServer {
       username: this.username,
       envelope,
       userPublicKey: publicKey,
-      oprfPublicKey: this.publicKey,
-      oprfSecretKey: this.secretKey
+      oprfPublicKey: this.oprfPublicKey,
+      oprfSecretKey: this.oprfSecretKey
     }
   }
 }

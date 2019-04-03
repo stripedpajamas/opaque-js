@@ -16,10 +16,11 @@ test('registration flow', (t) => {
   const challenge = Buffer.alloc(sodium.crypto_scalarmult_ed25519_BYTES)
   sodium.randombytes_buf(secret)
   sodium.crypto_core_ed25519_from_uniform(challenge, secret)
-  const { publicKey, response } = server.register({ username, challenge })
+  const { oprfPublicKey, publicKey, response } = server.register({ username, challenge })
 
   t.is(server.registrations.size, 1)
-  t.is(publicKey.length, sodium.crypto_core_ed25519_BYTES)
+  t.is(publicKey.length, sodium.crypto_kx_PUBLICKEYBYTES)
+  t.is(oprfPublicKey.length, sodium.crypto_core_ed25519_BYTES)
   t.is(response.length, sodium.crypto_core_ed25519_BYTES)
 
   const envelope = {}
