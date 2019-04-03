@@ -29,8 +29,9 @@ class RegistrationClient {
 
     // begin OPRF flow
     const { challenge, r } = oprf.challenge({ password: this.password })
-    // we will need the random scalar later
+    // we will need the random scalar and username later
     this.randomScalar = r
+    this.username = username
 
     // challenge can now be consumed be the server
     return { username, challenge }
@@ -59,7 +60,7 @@ class RegistrationClient {
     sodium.crypto_secretbox_easy(ciphertext, message, nonce, rwd)
 
     const envelope = { ciphertext, nonce }
-    return { publicKey: this.pk, envelope }
+    return { username: this.username, publicKey: this.pk, envelope }
   }
 }
 
