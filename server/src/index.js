@@ -19,6 +19,8 @@ class Server {
     // keep track of regs/auths because it's a multi-step flow
     this.registrations = new Map()
     this.authentications = new Map()
+
+    this.init()
   }
   init () {
     const {
@@ -60,7 +62,7 @@ class Server {
     this.registrations.delete(username)
     return userData
   }
-  authenticate ({ config = {}, userData, challenge, proof }) {
+  authenticate ({ config = {}, userData, challenge, userSession }) {
     const { username } = userData
     if (!this.authentications.has(username)) {
       // first step of authentication flow
@@ -71,7 +73,7 @@ class Server {
     }
     // second step of authentication flow
     const authentication = this.authentications.get(username)
-    const verified = authentication.verify({ proof })
+    const verified = authentication.authenticate({ userSession })
 
     // cleanup authentications map
     this.authentications.delete(username)

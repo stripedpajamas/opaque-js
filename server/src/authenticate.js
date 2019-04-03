@@ -11,7 +11,7 @@ const oprf = require('./oprf')
  * 1. Receive username, OPRF-alpha from client
  * 2. Retrieve user parameters from storage
  * 3. Compute OPRF-beta
- * 4. Send user parameters EnvU, vU and OPRF-beta to client
+ * 4. Send user parameters EnvU, vU, KX public key and OPRF-beta to client
  * 5. Optionally perform simple signature-based auth
  */
 
@@ -25,14 +25,19 @@ class AuthenticationServer {
     const { envelope, userPublicKey, oprfPublicKey, oprfSecretKey } = userData
     const response = oprf.response({ secretKey: oprfSecretKey, challenge })
     this.userPublicKey = userPublicKey
-    return { envelope, publicKey: oprfPublicKey, response }
+    return { envelope, oprfPublicKey, kxPublicKey: this.config.pk, response }
   }
-  verify ({ proof }) {
+  authenticate ({ userSession }) {
     if (!this.userPublicKey) return false
-    // given data signed with the user's private key,
-    // verify signature is valid
-    const msg = Buffer.alloc(proof.length - sodium.crypto_sign_BYTES)
-    return sodium.crypto_sign_open(msg, proof, this.userPublicKey)
+    const serverSession = Buffer.alloc(sodium.crypto_kx_SESSIONKEYBYTES)
+    sodium.crypto_kx_server_session_keys(
+      serverSession,
+      null,
+      this.config.pk,
+      this.config.sk,
+      this.userPublicKey
+    )
+    return sodium.sodium_memcmp(userSession, serverSession)
   }
 }
 
