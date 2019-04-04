@@ -31,5 +31,5 @@ test('full flow', (t) => {
     ...clientMessage2
   })
 
-  t.is(authenticated, true) // 🎉🎉🎉
+  t.is(authenticated, true) // 🎉 🎉 🎉
 })
