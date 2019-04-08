@@ -18,7 +18,10 @@ test('registration flow', (t) => {
   const response1 = {
     oprfPublicKey: Buffer.alloc(sodium.crypto_core_ed25519_BYTES),
     serverPublicKey: Buffer.alloc(sodium.crypto_kx_PUBLICKEYBYTES),
-    response: Buffer.alloc(sodium.crypto_core_ed25519_BYTES)
+    response: Buffer.alloc(sodium.crypto_core_ed25519_BYTES),
+    hashOpsLimit: sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+    hashMemLimit: sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+    hashSalt: Buffer.alloc(sodium.crypto_pwhash_SALTBYTES)
   }
   sodium.crypto_scalarmult_ed25519_base(response1.oprfPublicKey, serverOprfSecret)
 
@@ -47,7 +50,10 @@ test('authentication flow', (t) => {
   const response1 = {
     oprfPublicKey: Buffer.alloc(sodium.crypto_core_ed25519_BYTES),
     serverPublicKey: Buffer.alloc(sodium.crypto_kx_PUBLICKEYBYTES),
-    response: Buffer.alloc(sodium.crypto_core_ed25519_BYTES)
+    response: Buffer.alloc(sodium.crypto_core_ed25519_BYTES),
+    hashOpsLimit: sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+    hashMemLimit: sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+    hashSalt: Buffer.alloc(sodium.crypto_pwhash_SALTBYTES)
   }
   sodium.crypto_kx_keypair(response1.serverPublicKey, serverSecretKey)
   sodium.crypto_scalarmult_ed25519(response1.response, oprfSecretKey, message1.challenge)
@@ -71,10 +77,14 @@ test('authentication flow', (t) => {
   const response = Buffer.alloc(sodium.crypto_core_ed25519_BYTES)
   sodium.crypto_scalarmult_ed25519(response, oprfSecretKey, authMsg1.challenge)
   // sends back envelope, oprfPublicKey, and response to client
+  // as well as the iterative hash params
   const serverMsg = {
     envelope: userData.envelope,
     oprfPublicKey: userData.oprfPublicKey,
-    response
+    response,
+    hashOpsLimit: sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+    hashMemLimit: sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+    hashSalt: Buffer.alloc(sodium.crypto_pwhash_SALTBYTES)
   }
   const { userSession } = client.authenticate(serverMsg)
 

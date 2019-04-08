@@ -4,6 +4,14 @@ const AuthenticationServer = require('./authenticate')
 
 /**
  * Server class for registration and authentication
+ *
+ * The ops limit, memory limit, and salt for an iterative hash function
+ * are set in the initial config and later communicated to the client
+ * for hardening the OPRF output. sodium.crypto_pwhash_ALG_DEFAULT is
+ * the algorithm used.
+ *
+ * The design paper states that for OPAQUE the salt can be set to a constant
+ * such as all zeros. That is the default here.
  */
 
 class Server {
@@ -11,6 +19,8 @@ class Server {
     this.config = Object.assign({}, {
       pk: null,
       sk: null,
+      hashOpsLimit: sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+      hashMemLimit: sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
       log: () => {}
     }, config)
 
@@ -36,8 +46,16 @@ class Server {
       this.config.pk = newPk
       this.config.sk = newSk
 
-      // allow consumer to persist keypair
-      return { pk: newPk, sk: newSk }
+      // it is important to persist Server.config.pk
+      // and Server.config.sk and pass them in at construction
+      // for future registrations/authentications
+    }
+
+    const { hashSalt } = this.config
+    if (!hashSalt || hashSalt.length !== sodium.crypto_pwhash_SALTBYTES) {
+      this.log('No custom hash salt passed in, using default all-zeros')
+      const newHashSalt = Buffer.alloc(sodium.crypto_pwhash_SALTBYTES) // all zeros
+      this.config.hashSalt = newHashSalt
     }
   }
   /**

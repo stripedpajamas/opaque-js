@@ -26,6 +26,12 @@ class RegistrationServer {
     this.oprfSecretKey = secretKey
 
     return {
+      // these 3 fields are for the hardening operation done post-OPRF
+      // on the client side
+      hashOpsLimit: this.config.hashOpsLimit,
+      hashMemLimit: this.config.hashMemLimit,
+      hashSalt: this.config.hashSalt,
+
       serverPublicKey: this.config.pk,
       oprfPublicKey: this.oprfPublicKey,
       response

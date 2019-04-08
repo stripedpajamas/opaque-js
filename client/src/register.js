@@ -36,7 +36,7 @@ class RegistrationClient {
     // challenge can now be consumed be the server
     return { username, challenge }
   }
-  register ({ response, oprfPublicKey, serverPublicKey }) {
+  register ({ response, oprfPublicKey, serverPublicKey, hashOpsLimit, hashMemLimit, hashSalt }) {
     // server sent back response to challenge and OPRF public key
     // complete the OPRF flow
     const rwd = oprf.output({
@@ -45,6 +45,10 @@ class RegistrationClient {
       oprfPublicKey,
       r: this.randomScalar
     })
+
+    // apply argon2 to rwd using the hardening params sent from the server
+    const key = sodium.sodium_malloc(sodium.crypto_secretbox_KEYBYTES)
+    sodium.crypto_pwhash(key, rwd, hashSalt, hashOpsLimit, hashMemLimit, sodium.crypto_pwhash_ALG_DEFAULT)
 
     // use rwd as the key to an authenticated encryption of
     // client's keypair and server's kx public key
@@ -57,7 +61,7 @@ class RegistrationClient {
     const ciphertext = Buffer.alloc(message.length + sodium.crypto_secretbox_MACBYTES)
 
     sodium.randombytes_buf(nonce) // insert random data into nonce
-    sodium.crypto_secretbox_easy(ciphertext, message, nonce, rwd)
+    sodium.crypto_secretbox_easy(ciphertext, message, nonce, key)
 
     const envelope = { ciphertext, nonce }
     return { username: this.username, publicKey: this.pk, envelope }

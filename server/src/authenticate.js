@@ -25,7 +25,17 @@ class AuthenticationServer {
     const { envelope, userPublicKey, oprfPublicKey, oprfSecretKey } = userData
     const response = oprf.response({ secretKey: oprfSecretKey, challenge })
     this.userPublicKey = userPublicKey
-    return { envelope, oprfPublicKey, response }
+    return {
+      // these 3 fields are for the hardening operation done post-OPRF
+      // on the client side
+      hashOpsLimit: this.config.hashOpsLimit,
+      hashMemLimit: this.config.hashMemLimit,
+      hashSalt: this.config.hashSalt,
+
+      envelope,
+      oprfPublicKey,
+      response
+    }
   }
   authenticate ({ userSession }) {
     if (!this.userPublicKey) return false

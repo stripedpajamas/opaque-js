@@ -11,8 +11,11 @@ class Client {
    * @param {object} params
    * Step 1 requires username, password
    * Step 2 requires the server's OPRF response, OPRF public key, and KX key
+   * as well as the hardening params for the OPRF output
    */
-  register ({ username, password, response, oprfPublicKey, serverPublicKey }) {
+  register ({
+    username, password,
+    response, oprfPublicKey, serverPublicKey, hashOpsLimit, hashMemLimit, hashSalt }) {
     if (!this.registration) {
       this.registration = new RegistrationClient()
       return this.registration.start({ username, password })
@@ -20,7 +23,10 @@ class Client {
     const result = this.registration.register({
       response,
       oprfPublicKey,
-      serverPublicKey
+      serverPublicKey,
+      hashOpsLimit,
+      hashMemLimit,
+      hashSalt
     })
     this.registration = null
     return result
@@ -30,8 +36,11 @@ class Client {
    * @param {object} params
    * Step 1 requires username, password
    * Step 2 requires envelope, oprfPublicKey, response
+   * as well as the hardening params for the OPRF output
    */
-  authenticate ({ username, password, envelope, oprfPublicKey, response }) {
+  authenticate ({
+    username, password,
+    envelope, oprfPublicKey, response, hashOpsLimit, hashMemLimit, hashSalt }) {
     if (!this.authentication) {
       this.authentication = new AuthenticationClient()
       return this.authentication.start({ username, password })
@@ -39,7 +48,10 @@ class Client {
     const { userSession } = this.authentication.authenticate({
       envelope,
       oprfPublicKey,
-      response
+      response,
+      hashOpsLimit,
+      hashMemLimit,
+      hashSalt
     })
     this.authentication = null
     return { userSession }

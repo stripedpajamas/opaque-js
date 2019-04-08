@@ -16,12 +16,24 @@ test('registration flow', (t) => {
   const challenge = Buffer.alloc(sodium.crypto_scalarmult_ed25519_BYTES)
   sodium.randombytes_buf(secret)
   sodium.crypto_core_ed25519_from_uniform(challenge, secret)
-  const { oprfPublicKey, serverPublicKey, response } = server.register({ username, challenge })
+  const {
+    hashOpsLimit,
+    hashMemLimit,
+    hashSalt,
+    oprfPublicKey,
+    serverPublicKey,
+    response
+  } = server.register({ username, challenge })
 
   t.is(server.registrations.size, 1)
   t.is(serverPublicKey.length, sodium.crypto_kx_PUBLICKEYBYTES)
   t.is(oprfPublicKey.length, sodium.crypto_core_ed25519_BYTES)
   t.is(response.length, sodium.crypto_core_ed25519_BYTES)
+
+  // hardening params
+  t.is(typeof hashOpsLimit, 'number')
+  t.is(typeof hashMemLimit, 'number')
+  t.is(hashSalt.length, sodium.crypto_pwhash_SALTBYTES)
 
   const envelope = {}
   const userPublicKey = Buffer.alloc(0)
@@ -53,6 +65,9 @@ test('authentication flow', (t) => {
 
   // auth begins
   const {
+    hashOpsLimit,
+    hashMemLimit,
+    hashSalt,
     envelope: retrievedEnvelope,
     oprfPublicKey,
     response
@@ -62,6 +77,11 @@ test('authentication flow', (t) => {
   t.is(retrievedEnvelope, envelope)
   t.is(oprfPublicKey.length, sodium.crypto_core_ed25519_BYTES)
   t.is(response.length, sodium.crypto_core_ed25519_BYTES)
+
+  // hardening params
+  t.is(typeof hashOpsLimit, 'number')
+  t.is(typeof hashMemLimit, 'number')
+  t.is(hashSalt.length, sodium.crypto_pwhash_SALTBYTES)
 
   // client does some stuff with the envelope to retrieve their private key
   // and can then perform a key exchange
