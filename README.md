@@ -19,7 +19,7 @@ session key to the server and the server constant-time comparing it to its own d
 - [x] client registration and authentication logic
 - [x] basic unit tests for server/client
 - [x] basic integration test demonstrating how the client and server interplay
-- [ ] apply iterative hash function to OPRF output to harden against offline dictionary attacks
+- [x] apply iterative hash function to OPRF output to harden against offline dictionary attacks
 - [ ] invalid parameter checking
 - [ ] error catching/handling
 - [ ] unit tests for invalid/malicious input
