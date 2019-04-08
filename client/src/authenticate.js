@@ -23,7 +23,7 @@ class AuthenticationClient {
 
     return { username, challenge }
   }
-  authenticate ({ envelope, oprfPublicKey, response }) {
+  authenticate ({ envelope, oprfPublicKey, response, hashOpsLimit, hashMemLimit, hashSalt }) {
     // compute rwd which is the key used to decrypt envelope
     const rwd = oprf.output({
       password: this.password,
@@ -31,10 +31,15 @@ class AuthenticationClient {
       oprfPublicKey,
       r: this.randomScalar
     })
+
+    // apply argon2 to rwd using the hardening params sent from the server
+    const key = sodium.sodium_malloc(sodium.crypto_secretbox_KEYBYTES)
+    sodium.crypto_pwhash(key, rwd, hashSalt, hashOpsLimit, hashMemLimit, sodium.crypto_pwhash_ALG_DEFAULT)
+
     const { ciphertext, nonce } = envelope
     const openedEnvelope = Buffer.alloc(ciphertext.length - sodium.crypto_secretbox_MACBYTES)
-    const success = sodium.crypto_secretbox_open_easy(openedEnvelope, ciphertext, nonce, rwd)
-    if (!success) return { userSession: Buffer.alloc(0) }
+    const success = sodium.crypto_secretbox_open_easy(openedEnvelope, ciphertext, nonce, key)
+    if (!success) return { userSession: Buffer.alloc(sodium.crypto_kx_SESSIONKEYBYTES) }
 
     // extract the data from the opened envelope
     let {

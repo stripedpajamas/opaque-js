@@ -65,6 +65,9 @@ test('authentication flow', (t) => {
 
   // auth begins
   const {
+    hashOpsLimit,
+    hashMemLimit,
+    hashSalt,
     envelope: retrievedEnvelope,
     oprfPublicKey,
     response
@@ -74,6 +77,11 @@ test('authentication flow', (t) => {
   t.is(retrievedEnvelope, envelope)
   t.is(oprfPublicKey.length, sodium.crypto_core_ed25519_BYTES)
   t.is(response.length, sodium.crypto_core_ed25519_BYTES)
+
+  // hardening params
+  t.is(typeof hashOpsLimit, 'number')
+  t.is(typeof hashMemLimit, 'number')
+  t.is(hashSalt.length, sodium.crypto_pwhash_SALTBYTES)
 
   // client does some stuff with the envelope to retrieve their private key
   // and can then perform a key exchange
