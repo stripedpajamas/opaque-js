@@ -26,10 +26,24 @@ test('full flow', (t) => {
     ...clientMessage1
   })
   clientMessage2 = client.authenticate(serverMessage1)
-  const authenticated = server.authenticate({
+  let authenticated = server.authenticate({
     userData,
     ...clientMessage2
   })
 
   t.is(authenticated, true) // 🎉 🎉 🎉
+
+  // try again with an invalid password
+  clientMessage1 = client.authenticate({ username, password: 'wrong' })
+  serverMessage1 = server.authenticate({
+    userData,
+    ...clientMessage1
+  })
+  clientMessage2 = client.authenticate(serverMessage1)
+  authenticated = server.authenticate({
+    userData,
+    ...clientMessage2
+  })
+
+  t.is(authenticated, false) // 🔒 🔒 🔒
 })
