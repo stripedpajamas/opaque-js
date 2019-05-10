@@ -2,6 +2,12 @@ const test = require('ava')
 const sodium = require('sodium-native')
 const Client = require('../src')
 
+test('out of order throws', (t) => {
+  const client = new Client()
+  t.throws(() => client.finishRegistration())
+  t.throws(() => client.finishAuthentication())
+})
+
 test('registration flow', (t) => {
   const client = new Client()
   const username = 'pete'
