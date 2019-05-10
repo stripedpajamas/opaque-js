@@ -59,21 +59,28 @@ class Server {
     }
   }
   /**
-   * Register a new user
+   * Begin registration a new user
    * @param {object} userParams
    * Step 1 requires username and challenge
+   */
+  beginRegistration ({ config = {}, username, challenge }) {
+    // first step of registration flow
+    const registration = new RegistrationServer(Object.assign({}, this.config, config))
+    this.registrations.set(username, registration)
+    const response = registration.start({ username, challenge })
+    return response
+  }
+  /**
+   * Complete registration of a new user
+   * @param {object}
    * Step 2 requires username, envelope and publicKey
    */
-  register ({ config = {}, username, challenge, envelope, publicKey }) {
-    if (!this.registrations.has(username)) {
-      // first step of registration flow
-      const registration = new RegistrationServer(Object.assign({}, this.config, config))
-      this.registrations.set(username, registration)
-      const response = registration.start({ username, challenge })
-      return response
-    }
+  finishRegistration ({ username, envelope, publicKey }) {
     // second step of registration flow
     const registration = this.registrations.get(username)
+    if (!registration) {
+      throw new Error('no initialized registration found for user; must begin registration first')
+    }
     const userData = registration.register({ envelope, publicKey })
 
     // cleanup registrations map
@@ -81,22 +88,29 @@ class Server {
     return userData
   }
   /**
-   * Authenticate an already registered user
+   * Begins authentication of an already registered user
    * @param {object} params
    * Step 1 requires userData, challenge
+   */
+  beginAuthentication ({ config = {}, userData, challenge }) {
+    const { username } = userData
+    // first step of authentication flow
+    const authentication = new AuthenticationServer(Object.assign({}, this.config, config))
+    this.authentications.set(username, authentication)
+    const response = authentication.start({ userData, challenge })
+    return response
+  }
+  /**
+   * Completes authentication of an existing user
+   * @param {object} params
    * Step 2 requires userData, userSession
    */
-  authenticate ({ config = {}, userData, challenge, userSession }) {
+  finishAuthentication ({ userData, userSession }) {
     const { username } = userData
-    if (!this.authentications.has(username)) {
-      // first step of authentication flow
-      const authentication = new AuthenticationServer(Object.assign({}, this.config, config))
-      this.authentications.set(username, authentication)
-      const response = authentication.start({ userData, challenge })
-      return response
-    }
-    // second step of authentication flow
     const authentication = this.authentications.get(username)
+    if (!authentication) {
+      throw new Error('no initialized authentication found for user; must begin authentication first')
+    }
     const verified = authentication.authenticate({ userSession })
 
     // cleanup authentications map

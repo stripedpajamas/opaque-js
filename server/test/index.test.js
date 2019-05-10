@@ -23,7 +23,7 @@ test('registration flow', (t) => {
     oprfPublicKey,
     serverPublicKey,
     response
-  } = server.register({ username, challenge })
+  } = server.beginRegistration({ username, challenge })
 
   t.is(server.registrations.size, 1)
   t.is(serverPublicKey.length, sodium.crypto_kx_PUBLICKEYBYTES)
@@ -37,7 +37,7 @@ test('registration flow', (t) => {
 
   const envelope = {}
   const userPublicKey = Buffer.alloc(0)
-  const userData = server.register({ username, envelope, publicKey: userPublicKey })
+  const userData = server.finishRegistration({ username, envelope, publicKey: userPublicKey })
 
   t.is(server.registrations.size, 0)
   t.is(userData.userPublicKey, userPublicKey)
@@ -55,13 +55,13 @@ test('authentication flow', (t) => {
   const challenge = Buffer.alloc(sodium.crypto_scalarmult_ed25519_BYTES)
   sodium.randombytes_buf(secret)
   sodium.crypto_core_ed25519_from_uniform(challenge, secret)
-  server.register({ username, challenge })
+  server.beginRegistration({ username, challenge })
 
   const envelope = {}
   const userPk = Buffer.alloc(sodium.crypto_kx_PUBLICKEYBYTES)
   const userSk = Buffer.alloc(sodium.crypto_kx_SECRETKEYBYTES)
   sodium.crypto_kx_keypair(userPk, userSk)
-  const userData = server.register({ username, envelope, publicKey: userPk })
+  const userData = server.finishRegistration({ username, envelope, publicKey: userPk })
 
   // auth begins
   const {
@@ -71,7 +71,7 @@ test('authentication flow', (t) => {
     envelope: retrievedEnvelope,
     oprfPublicKey,
     response
-  } = server.authenticate({ userData, challenge })
+  } = server.beginAuthentication({ userData, challenge })
 
   t.is(server.authentications.size, 1)
   t.is(retrievedEnvelope, envelope)
@@ -88,7 +88,7 @@ test('authentication flow', (t) => {
   const userSession = Buffer.alloc(sodium.crypto_kx_SESSIONKEYBYTES)
   sodium.crypto_kx_client_session_keys(userSession, null, userPk, userSk, server.config.pk)
 
-  const authenticated = server.authenticate({ userData, userSession })
+  const authenticated = server.finishAuthentication({ userData, userSession })
   t.truthy(authenticated)
   t.is(server.authentications.size, 0)
 })

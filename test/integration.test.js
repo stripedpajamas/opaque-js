@@ -10,9 +10,9 @@ test('full flow', (t) => {
   const password = 'help'
 
   let clientMessage1 = client.register({ username, password })
-  let serverMessage1 = server.register(clientMessage1)
+  let serverMessage1 = server.beginRegistration(clientMessage1)
   let clientMessage2 = client.register(serverMessage1)
-  const userData = server.register(clientMessage2)
+  const userData = server.finishRegistration(clientMessage2)
 
   // userData is to be persisted on the server
   // the user is now considered registered
@@ -21,12 +21,12 @@ test('full flow', (t) => {
   clientMessage1 = client.authenticate({ username, password })
   // server looks up username in DB to find userData
   // and then continues
-  serverMessage1 = server.authenticate({
+  serverMessage1 = server.beginAuthentication({
     userData,
     ...clientMessage1
   })
   clientMessage2 = client.authenticate(serverMessage1)
-  let authenticated = server.authenticate({
+  let authenticated = server.finishAuthentication({
     userData,
     ...clientMessage2
   })
@@ -35,12 +35,12 @@ test('full flow', (t) => {
 
   // try again with an invalid password
   clientMessage1 = client.authenticate({ username, password: 'wrong' })
-  serverMessage1 = server.authenticate({
+  serverMessage1 = server.beginAuthentication({
     userData,
     ...clientMessage1
   })
   clientMessage2 = client.authenticate(serverMessage1)
-  authenticated = server.authenticate({
+  authenticated = server.finishAuthentication({
     userData,
     ...clientMessage2
   })
