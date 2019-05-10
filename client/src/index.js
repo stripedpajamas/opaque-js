@@ -7,18 +7,23 @@ class Client {
     this.authentication = null
   }
   /**
-   * Register a user with the server
+   * Begin registration of a user with the server
    * @param {object} params
    * Step 1 requires username, password
+   */
+  beginRegistration ({ username, password }) {
+    this.registration = new RegistrationClient()
+    return this.registration.start({ username, password })
+  }
+  /**
+   * Finish registration of a new user with a server
+   * @param {object} params
    * Step 2 requires the server's OPRF response, OPRF public key, and KX key
    * as well as the hardening params for the OPRF output
    */
-  register ({
-    username, password,
-    response, oprfPublicKey, serverPublicKey, hashOpsLimit, hashMemLimit, hashSalt }) {
+  finishRegistration ({ response, oprfPublicKey, serverPublicKey, hashOpsLimit, hashMemLimit, hashSalt }) {
     if (!this.registration) {
-      this.registration = new RegistrationClient()
-      return this.registration.start({ username, password })
+      throw new Error('must begin registration before finishing')
     }
     const result = this.registration.register({
       response,
@@ -32,18 +37,23 @@ class Client {
     return result
   }
   /**
-   * Authenticate with the server
+   * Begin authentication with the server
    * @param {object} params
    * Step 1 requires username, password
+   */
+  beginAuthentication ({ username, password }) {
+    this.authentication = new AuthenticationClient()
+    return this.authentication.start({ username, password })
+  }
+  /**
+   * Finish authentication with the server
+   * @param {object} params
    * Step 2 requires envelope, oprfPublicKey, response
    * as well as the hardening params for the OPRF output
    */
-  authenticate ({
-    username, password,
-    envelope, oprfPublicKey, response, hashOpsLimit, hashMemLimit, hashSalt }) {
+  finishAuthentication ({ envelope, oprfPublicKey, response, hashOpsLimit, hashMemLimit, hashSalt }) {
     if (!this.authentication) {
-      this.authentication = new AuthenticationClient()
-      return this.authentication.start({ username, password })
+      throw new Error('must begin authentication before finishing')
     }
     const { userSession } = this.authentication.authenticate({
       envelope,
