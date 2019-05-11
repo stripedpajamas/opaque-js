@@ -8,6 +8,26 @@ test('out of order throws', (t) => {
   t.throws(() => client.finishAuthentication())
 })
 
+test('no username or password throws', (t) => {
+  const client = new Client()
+  t.throws(() => client.beginRegistration())
+  t.throws(() => client.beginRegistration({}))
+  t.throws(() => client.beginAuthentication())
+  t.throws(() => client.beginAuthentication({}))
+})
+
+test('missing params in registration completion throws', (t) => {
+  const client = new Client()
+  const username = 'pete'
+  const password = 'help'
+  client.beginRegistration({ username, password })
+  t.throws(() => client.finishRegistration())
+  t.throws(() => client.finishRegistration({}))
+  client.beginAuthentication({ username, password })
+  t.throws(() => client.finishAuthentication())
+  t.throws(() => client.finishAuthentication({}))
+})
+
 test('registration flow', (t) => {
   const client = new Client()
   const username = 'pete'

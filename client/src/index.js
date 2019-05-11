@@ -11,7 +11,11 @@ class Client {
    * @param {object} params
    * Step 1 requires username, password
    */
-  beginRegistration ({ username, password }) {
+  beginRegistration (input = {}) {
+    const { username, password } = input
+    if (!username || !password) {
+      throw new Error('username and password required to register')
+    }
     this.registration = new RegistrationClient()
     return this.registration.start({ username, password })
   }
@@ -21,7 +25,18 @@ class Client {
    * Step 2 requires the server's OPRF response, OPRF public key, and KX key
    * as well as the hardening params for the OPRF output
    */
-  finishRegistration ({ response, oprfPublicKey, serverPublicKey, hashOpsLimit, hashMemLimit, hashSalt }) {
+  finishRegistration (input) {
+    const {
+      response,
+      oprfPublicKey,
+      serverPublicKey,
+      hashOpsLimit,
+      hashMemLimit,
+      hashSalt
+    } = input
+    if (!response || !oprfPublicKey || !serverPublicKey || !hashOpsLimit || !hashMemLimit || !hashSalt) {
+      throw new Error('missing parameters in finish registration step')
+    }
     if (!this.registration) {
       throw new Error('must begin registration before finishing')
     }
@@ -41,7 +56,11 @@ class Client {
    * @param {object} params
    * Step 1 requires username, password
    */
-  beginAuthentication ({ username, password }) {
+  beginAuthentication (input = {}) {
+    const { username, password } = input
+    if (!username || !password) {
+      throw new Error('username and password required to register')
+    }
     this.authentication = new AuthenticationClient()
     return this.authentication.start({ username, password })
   }
@@ -51,7 +70,18 @@ class Client {
    * Step 2 requires envelope, oprfPublicKey, response
    * as well as the hardening params for the OPRF output
    */
-  finishAuthentication ({ envelope, oprfPublicKey, response, hashOpsLimit, hashMemLimit, hashSalt }) {
+  finishAuthentication (input = {}) {
+    const {
+      envelope,
+      oprfPublicKey,
+      response,
+      hashOpsLimit,
+      hashMemLimit,
+      hashSalt
+    } = input
+    if (!envelope || !oprfPublicKey || !response || !hashOpsLimit || !hashMemLimit || !hashSalt) {
+      throw new Error('missing parameters in finish registration step')
+    }
     if (!this.authentication) {
       throw new Error('must begin authentication before finishing')
     }
