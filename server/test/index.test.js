@@ -8,6 +8,31 @@ test('out of order throws', (t) => {
   t.throws(() => server.finishAuthentication())
 })
 
+test('missing params throws', (t) => {
+  const server = new Server()
+  t.throws(() => server.beginRegistration())
+  t.throws(() => server.beginRegistration({}))
+
+  const username = 'pete'
+  const secret = Buffer.alloc(sodium.crypto_core_ed25519_UNIFORMBYTES)
+  const challenge = Buffer.alloc(sodium.crypto_scalarmult_ed25519_BYTES)
+  sodium.randombytes_buf(secret)
+  sodium.crypto_core_ed25519_from_uniform(challenge, secret)
+
+  server.beginRegistration({ username, challenge })
+
+  t.throws(() => server.finishRegistration())
+  t.throws(() => server.finishRegistration({}))
+
+  t.throws(() => server.beginAuthentication())
+  t.throws(() => server.beginAuthentication({}))
+
+  server.authentications.set('pete', 'something')
+
+  t.throws(() => server.finishAuthentication())
+  t.throws(() => server.finishAuthentication({}))
+})
+
 test('init creates a keypair if none passed in', (t) => {
   const server = new Server()
   t.is(server.config.pk.length, sodium.crypto_kx_PUBLICKEYBYTES, 'pk correct length')

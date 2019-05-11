@@ -16,7 +16,7 @@ test('no username or password throws', (t) => {
   t.throws(() => client.beginAuthentication({}))
 })
 
-test('missing params in registration completion throws', (t) => {
+test('missing params throws', (t) => {
   const client = new Client()
   const username = 'pete'
   const password = 'help'

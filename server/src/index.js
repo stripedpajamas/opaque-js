@@ -63,7 +63,11 @@ class Server {
    * @param {object} userParams
    * Step 1 requires username and challenge
    */
-  beginRegistration ({ config = {}, username, challenge }) {
+  beginRegistration (input = {}) {
+    const { config = {}, username, challenge } = input
+    if (!username || !challenge) {
+      throw new Error('username and challenge required to begin registration')
+    }
     // first step of registration flow
     const registration = new RegistrationServer(Object.assign({}, this.config, config))
     this.registrations.set(username, registration)
@@ -75,7 +79,11 @@ class Server {
    * @param {object}
    * Step 2 requires username, envelope and publicKey
    */
-  finishRegistration ({ username, envelope, publicKey }) {
+  finishRegistration (input = {}) {
+    const { username, envelope, publicKey } = input
+    if (!username || !envelope || !publicKey) {
+      throw new Error('username, envelope, and publicKey required to finish registration')
+    }
     // second step of registration flow
     const registration = this.registrations.get(username)
     if (!registration) {
@@ -92,7 +100,11 @@ class Server {
    * @param {object} params
    * Step 1 requires userData, challenge
    */
-  beginAuthentication ({ config = {}, userData, challenge }) {
+  beginAuthentication (input = {}) {
+    const { config = {}, userData, challenge } = input
+    if (!userData || !challenge) {
+      throw new Error('userData and challenge required to begin authentication')
+    }
     const { username } = userData
     // first step of authentication flow
     const authentication = new AuthenticationServer(Object.assign({}, this.config, config))
@@ -105,7 +117,11 @@ class Server {
    * @param {object} params
    * Step 2 requires userData, userSession
    */
-  finishAuthentication ({ userData, userSession }) {
+  finishAuthentication (input = {}) {
+    const { userData, userSession } = input
+    if (!userData || !userSession) {
+      throw new Error('userData and userSession required to finish authentication')
+    }
     const { username } = userData
     const authentication = this.authentications.get(username)
     if (!authentication) {

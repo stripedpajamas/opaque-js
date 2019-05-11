@@ -25,7 +25,7 @@ class Client {
    * Step 2 requires the server's OPRF response, OPRF public key, and KX key
    * as well as the hardening params for the OPRF output
    */
-  finishRegistration (input) {
+  finishRegistration (input = {}) {
     const {
       response,
       oprfPublicKey,
