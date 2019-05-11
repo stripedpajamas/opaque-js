@@ -20,9 +20,9 @@ session key to the server and the server constant-time comparing it to its own d
 - [x] basic unit tests for server/client
 - [x] basic integration test demonstrating how the client and server interplay
 - [x] apply iterative hash function to OPRF output to harden against offline dictionary attacks
-- [ ] invalid parameter checking
-- [ ] error catching/handling
-- [ ] unit tests for invalid/malicious input
+- [x] invalid parameter checking
+- [x] error catching/handling
+- [x] unit tests for invalid input
 - [ ] browser JS client implementation using [wasm-crypto](https://github.com/jedisct1/wasm-crypto)
 - [ ] basic integration test combining browser JS client with server side logic
 - [ ] wrap server logic in http middleware in another package for easier plug n play
